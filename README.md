@@ -2,7 +2,7 @@
 
 ## Project Setup 
 - Create a repository on git hub and clone it via:
-> git clone `repo url`
+`git clone `repo url` `
 
 Initialize the project with npm:
 - `npm init -y`
