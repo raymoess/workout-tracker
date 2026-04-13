@@ -2,6 +2,7 @@
 
 ## Project Setup 
 - Create a repository on git hub and clone it via:
+
 `git clone` `REPOURL`
 
 Initialize the project with npm:
