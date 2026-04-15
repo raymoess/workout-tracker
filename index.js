@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const todoRoutes = require('./routes/todoRoute');
+const todoRoutes = require('./routes/workoutRoute');
 const bodyParser = require('body-parser');
 const errorMiddleware = require('./middleware/errorMiddleware');
 
