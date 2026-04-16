@@ -13,7 +13,7 @@ exports.getWorkoutById = function(req, res) {
         res.json(workout);
     });
 };
-
+    
 exports.createWorkout = function(req, res) {
     console.log(req.body);
     const newWorkout = {

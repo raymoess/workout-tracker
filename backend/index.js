@@ -1,6 +1,9 @@
+
 const express = require('express');
 const app = express();
-const todoRoutes = require('./routes/workoutRoute');
+const cors = require('cors');
+app.use(cors());
+const workoutRoutes = require('./routes/workoutRoute');
 const bodyParser = require('body-parser');
 const errorMiddleware = require('./middleware/errorMiddleware');
 
@@ -10,7 +13,7 @@ const PORT = process.env.PORT
 
 app.use(bodyParser.json());
 
-app.use('/todos', todoRoutes);
+app.use('/workouts', workoutRoutes);
 
 app.use(errorMiddleware);
 
