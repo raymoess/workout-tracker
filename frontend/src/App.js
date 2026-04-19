@@ -21,7 +21,8 @@ const styles = `
   }
 
   .header {
-    margin-bottom: 48px;
+    margin-bottom: 20px;
+    text-align: center;
   }
 
   .header h1 {
@@ -33,7 +34,7 @@ const styles = `
   }
 
   .header h1 span {
-    color: #c8f55a;
+    color: #f0ede6;
   }
 
   .header p {
@@ -47,16 +48,17 @@ const styles = `
   .form-card {
     background: #141414;
     border: 1px solid #1f1f1f;
-    border-radius: 4px;
+    /*border-radius: 4px;*/
     padding: 28px;
     margin-bottom: 40px;
   }
 
   .form-title {
+    text-align: center;
     font-family: 'Bebas Neue', sans-serif;
     font-size: 20px;
     letter-spacing: 2px;
-    color: #c8f55a;
+    color: #ff4d4d;
     margin-bottom: 20px;
   }
 
@@ -80,7 +82,7 @@ const styles = `
     width: 100%;
     background: #0a0a0a;
     border: 1px solid #2a2a2a;
-    border-radius: 3px;
+    /*border-radius: 3px;*/
     padding: 10px 14px;
     color: #f0ede6;
     font-family: 'DM Sans', sans-serif;
@@ -90,13 +92,13 @@ const styles = `
   }
 
   .field input:focus {
-    border-color: #c8f55a;
+    border-color: #ff4d4d;
   }
 
   .btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 3px;
+    /*border-radius: 3px;*/
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
     font-weight: 500;
@@ -106,12 +108,12 @@ const styles = `
   }
 
   .btn-primary {
-    background: #c8f55a;
+    background: #ff4d4d;
     color: #0a0a0a;
   }
 
   .btn-primary:hover {
-    background: #d4ff66;
+    background: #ff4d4d;
     transform: translateY(-1px);
   }
 
@@ -137,12 +139,12 @@ const styles = `
   }
 
   .btn-edit:hover {
-    border-color: #c8f55a;
-    color: #c8f55a;
+    border-color: #ff4d4d;
+    color: #ff4d4d;
   }
 
   .btn-save {
-    background: #c8f55a;
+    background: #ff4d4d;
     color: #0a0a0a;
     padding: 6px 12px;
     font-size: 12px;
@@ -183,7 +185,7 @@ const styles = `
   .workout-row {
     background: #141414;
     border: 1px solid #1f1f1f;
-    border-radius: 3px;
+    /*border-radius: 3px;*/
     padding: 16px 20px;
     display: grid;
     grid-template-columns: 2fr 1fr 1fr auto;
@@ -226,8 +228,8 @@ const styles = `
 
   .edit-row input {
     background: #0a0a0a;
-    border: 1px solid #c8f55a;
-    border-radius: 3px;
+    border: 1px solid #ff4d4d;
+    /*border-radius: 3px;*/
     padding: 6px 10px;
     color: #f0ede6;
     font-family: 'DM Sans', sans-serif;
@@ -249,7 +251,7 @@ const styles = `
     position: fixed;
     bottom: 24px;
     right: 24px;
-    background: #c8f55a;
+    background: #ff4d4d;
     color: #0a0a0a;
     padding: 12px 20px;
     border-radius: 3px;
@@ -265,37 +267,41 @@ const styles = `
 `;
 
 export default function App() {
-  const [workouts, setWorkouts] = useState([]);
-  const [form, setForm] = useState({ Workouts: "", Sets: "", Reps: "" });
-  const [editId, setEditId] = useState(null);
-  const [editForm, setEditForm] = useState({});
-  const [toast, setToast] = useState("");
+  const [workouts, setWorkouts] = useState([]); //stores all workouts from backend
+  const [form, setForm] = useState({ Workouts: "", Sets: "", Reps: "" }); //stores input values from user
+  const [editId, setEditId] = useState(null); //tracks which workout is being edited
+  const [editForm, setEditForm] = useState({}); //stores temp values when editing
+  const [toast, setToast] = useState(""); //stores notification message
 
-  const showToast = (msg) => {
+  const showToast = (msg) => { 
     setToast(msg);
     setTimeout(() => setToast(""), 2500);
-  };
+  }; //shows a notification messages and clears is after 2.5 seconds
 
-  const fetchWorkouts = async () => {
+  //GET Method
+  const fetchWorkouts = async () => { //calls backend and converts response from JSON
     const res = await fetch(API);
     const data = await res.json();
     setWorkouts(data);
   };
 
-  useEffect(() => { fetchWorkouts(); }, []);
+  useEffect(() => { fetchWorkouts(); }, []); 
 
-  const handleAdd = async () => {
-    if (!form.Workouts || !form.Sets || !form.Reps) return;
+  //POST Method
+  const handleAdd = async () => { 
+    if (!form.Workouts || !form.Sets || !form.Reps) return; //submissions must not be empty
     await fetch(API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
-    });
-    setForm({ Workouts: "", Sets: "", Reps: "" });
-    fetchWorkouts();
-    showToast("Workout logged!");
+    }); //sends data back to backend
+    setForm({ Workouts: "", Sets: "", Reps: "" }); //reset form
+    fetchWorkouts(); //refresh list
+    showToast("Workout logged."); //show notification
   };
 
+
+  //DELETED Method
   const handleDelete = async (id) => {
     await fetch(`${API}/${id}`, { method: "DELETE" });
     fetchWorkouts();
@@ -323,35 +329,32 @@ export default function App() {
       <style>{styles}</style>
       <div className="app">
         <div className="header">
-          <h1>WORKOUT<br /><span>LOGGER</span></h1>
-          <p>Track your gains. Own your progress.</p>
+          <h1>WORKOUT LOGGER<br /></h1>
         </div>
 
         <div className="form-card">
           <div className="form-title">LOG A WORKOUT</div>
           <div className="form-row">
             <div className="field">
-              <label>Exercise</label>
+              <label>Type of Exercise:</label>
               <input
-                placeholder="e.g. Bench Press"
+                placeholder="e.g Bench Press"
                 value={form.Workouts}
                 onChange={e => setForm({ ...form, Workouts: e.target.value })}
               />
             </div>
             <div className="field">
-              <label>Sets</label>
+              <label>Sets:</label>
               <input
-                type="number"
-                placeholder="4"
+                placeholder="0"
                 value={form.Sets}
                 onChange={e => setForm({ ...form, Sets: e.target.value })}
               />
             </div>
             <div className="field">
-              <label>Reps</label>
+              <label>Reps:</label>
               <input
-                type="number"
-                placeholder="10"
+                placeholder="0"
                 value={form.Reps}
                 onChange={e => setForm({ ...form, Reps: e.target.value })}
               />
@@ -360,7 +363,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="section-label">All Workouts</div>
+        <div className="section-label">Workouts:</div>
 
         <div className="workout-list">
           {workouts.length === 0 && (
@@ -371,8 +374,8 @@ export default function App() {
               {editId === w.id ? (
                 <div className="edit-row" style={{ gridColumn: "1 / -1" }}>
                   <input value={editForm.Workouts} onChange={e => setEditForm({ ...editForm, Workouts: e.target.value })} />
-                  <input type="number" value={editForm.Sets} onChange={e => setEditForm({ ...editForm, Sets: e.target.value })} />
-                  <input type="number" value={editForm.Reps} onChange={e => setEditForm({ ...editForm, Reps: e.target.value })} />
+                  <input value={editForm.Sets} onChange={e => setEditForm({ ...editForm, Sets: e.target.value })} />
+                  <input value={editForm.Reps} onChange={e => setEditForm({ ...editForm, Reps: e.target.value })} />
                   <div className="actions">
                     <button className="btn btn-save" onClick={() => handleSave(w.id)}>Save</button>
                     <button className="btn btn-cancel" onClick={() => setEditId(null)}>Cancel</button>
@@ -385,7 +388,7 @@ export default function App() {
                   <div className="workout-stat"><span>{w.Reps}</span> reps</div>
                   <div className="actions">
                     <button className="btn btn-edit" onClick={() => handleEdit(w)}>Edit</button>
-                    <button className="btn btn-danger" onClick={() => handleDelete(w.id)}>Del</button>
+                    <button className="btn btn-danger" onClick={() => handleDelete(w.id)}>Delete</button>
                   </div>
                 </>
               )}

@@ -30,7 +30,8 @@ exports.createWorkout = function(req, res) {
 
 exports.updateWorkout = function(req, res) {
     const updatedWorkout = {
-        Workout: req.body.Workout,
+        Workouts: req.body.Workouts,
+        Sets: req.body.Sets,
         Reps: req.body.Reps
     };
 
