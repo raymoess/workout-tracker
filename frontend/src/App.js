@@ -338,6 +338,7 @@ export default function App() {
             <div className="field">
               <label>Type of Exercise:</label>
               <input
+                type="text"
                 placeholder="e.g Bench Press"
                 value={form.Workouts}
                 onChange={e => setForm({ ...form, Workouts: e.target.value })}

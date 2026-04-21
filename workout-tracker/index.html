@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Workout Logger</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <div class="header">
+        <h1>WORKOUT LOGGER</h1>
+      </div>
+
+      <div class="form-card">
+        <div class="form-title">LOG A WORKOUT</div>
+        <div class="form-row">
+          <div class="field">
+            <label>Type of Exercise</label>
+            <input id="input-exercise" type="text" placeholder="e.g. Bench Press" />
+          </div>
+          <div class="field">
+            <label>Sets</label>
+            <input id="input-sets" type="text" placeholder="0" />
+          </div>
+          <div class="field">
+            <label>Reps</label>
+            <input id="input-reps" type="text" placeholder="0" />
+          </div>
+          <button class="btn btn-primary" id="btn-log">LOG</button>
+        </div>
+      </div>
+
+      <div class="section-label">Workouts</div>
+      <div class="workout-list" id="workout-list"></div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
