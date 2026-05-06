@@ -4,32 +4,28 @@ const API = "http://localhost:3000/workouts";
 interface Workout {
   id: number;
   Workouts: string;
-  Sets: string;
   Reps: string;
+  Created_on: string;
 }
 
 // DOM refs
 const list = document.getElementById("workout-list") as HTMLDivElement;
 const toastEl = document.getElementById("toast") as HTMLDivElement;
-const inputExercise = document.getElementById("input-exercise") as HTMLInputElement;
-const inputSets = document.getElementById("input-sets") as HTMLInputElement;
+const inputExercise = document.getElementById(
+  "input-exercise",
+) as HTMLInputElement;
 const inputReps = document.getElementById("input-reps") as HTMLInputElement;
 const btnLog = document.getElementById("btn-log") as HTMLButtonElement;
 
 // Validation
 const isValidExercise = (val: string): boolean => /^[a-zA-Z\s]*$/.test(val);
-const isValidNumber = (val: string): boolean => val === "" || (/^\d+$/.test(val) && parseInt(val) > 0);
+const isValidNumber = (val: string): boolean =>
+  val === "" || (/^\d+$/.test(val) && parseInt(val) > 0);
 
 // Restrict input as user types
 inputExercise.addEventListener("input", () => {
   if (!isValidExercise(inputExercise.value)) {
     inputExercise.value = inputExercise.value.replace(/[0-9]/g, "");
-  }
-});
-
-inputSets.addEventListener("input", () => {
-  if (!isValidNumber(inputSets.value)) {
-    inputSets.value = inputSets.value.replace(/[^0-9]/g, "");
   }
 });
 
@@ -52,6 +48,7 @@ function showToast(msg: string): void {
 async function fetchWorkouts(): Promise<void> {
   const res = await fetch(API);
   const data: Workout[] = await res.json();
+  console.log(data);
   renderWorkouts(data);
 }
 
@@ -64,32 +61,65 @@ function renderWorkouts(workouts: Workout[]): void {
     return;
   }
 
-  workouts.forEach((w) => {
-    const row = document.createElement("div");
-    row.className = "workout-row";
-    row.dataset.id = String(w.id);
-    row.innerHTML = `
-      <div class="workout-name">${w.Workouts}</div>
-      <div class="workout-stat"><span>${w.Sets}</span> sets</div>
-      <div class="workout-stat"><span>${w.Reps}</span> reps</div>
-      <div class="actions">
-        <button class="btn btn-edit" data-id="${w.id}">Edit</button>
-        <button class="btn btn-danger" data-id="${w.id}">Delete</button>
-      </div>
-    `;
+  //Group by date
+  const byDate = Object.groupBy(workouts, (w) => w.Created_on);
 
-    // Edit button
-    row.querySelector(".btn-edit")!.addEventListener("click", () => showEditRow(row, w));
+  //Loop through each date
+  for (const date in byDate) {
+    const dateWorkouts = byDate[date]!;
 
-    // Delete button
-    row.querySelector(".btn-danger")!.addEventListener("click", async () => {
-      await fetch(`${API}/${w.id}`, { method: "DELETE" });
-      fetchWorkouts();
-      showToast("Workout deleted.");
-    });
+    // Create date container
+    const dateContainer = document.createElement("div");
+    dateContainer.className = "date-group";
+    dateContainer.innerHTML = `<div class="date-label">${new Date(date).toLocaleDateString()}</div>`;
+    list.appendChild(dateContainer);
 
-    list.appendChild(row);
-  });
+    //Group by exercise within that date
+    const byExercise = Object.groupBy(dateWorkouts, (w) => w.Workouts);
+
+    //Loop through each exercise
+    for (const exercise in byExercise) {
+      const sets = byExercise[exercise]!;
+
+      // Create exercise container
+      const exerciseContainer = document.createElement("div");
+      exerciseContainer.className = "exercise-group";
+      exerciseContainer.innerHTML = `<div class="exercise-label">${exercise}</div>`;
+      dateContainer.appendChild(exerciseContainer);
+
+      //Loop through each set and render a row
+      sets.forEach((w, index) => {
+        const row = document.createElement("div");
+        const setNumber = index + 1;
+        row.className = "workout-row";
+        row.dataset.id = String(w.id);
+        row.innerHTML = `
+          <div class="workout-stat">Set <span>${setNumber}</span></div>
+          <div class="workout-stat"><span>${w.Reps}</span> reps</div>
+          <div class="actions">
+            <button class="btn btn-edit" data-id="${w.id}">Edit</button>
+            <button class="btn btn-danger" data-id="${w.id}">Delete</button>
+          </div>
+        `;
+
+        //Edit button
+        row
+          .querySelector(".btn-edit")!
+          .addEventListener("click", () => showEditRow(row, w));
+
+        // Delete button
+        row
+          .querySelector(".btn-danger")!
+          .addEventListener("click", async () => {
+            await fetch(`${API}/${w.id}`, { method: "DELETE" });
+            fetchWorkouts();
+            showToast("Workout deleted.");
+          });
+
+        exerciseContainer.appendChild(row);
+      });
+    }
+  }
 }
 
 // Show inline edit row
@@ -97,7 +127,6 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
   row.innerHTML = `
     <div class="edit-row">
       <input id="edit-exercise" type="text" value="${w.Workouts}" />
-      <input id="edit-sets" type="text" value="${w.Sets}" />
       <input id="edit-reps" type="text" value="${w.Reps}" />
       <div class="actions">
         <button class="btn btn-save" id="btn-save">Save</button>
@@ -107,19 +136,12 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
   `;
 
   const editExercise = row.querySelector("#edit-exercise") as HTMLInputElement;
-  const editSets = row.querySelector("#edit-sets") as HTMLInputElement;
   const editReps = row.querySelector("#edit-reps") as HTMLInputElement;
 
   // Validation on edit inputs
   editExercise.addEventListener("input", () => {
     if (!isValidExercise(editExercise.value)) {
       editExercise.value = editExercise.value.replace(/[0-9]/g, "");
-    }
-  });
-
-  editSets.addEventListener("input", () => {
-    if (!isValidNumber(editSets.value)) {
-      editSets.value = editSets.value.replace(/[^0-9]/g, "");
     }
   });
 
@@ -131,13 +153,12 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
 
   // Save
   row.querySelector("#btn-save")!.addEventListener("click", async () => {
-    if (!editExercise.value || !editSets.value || !editReps.value) return;
+    if (!editExercise.value || !editReps.value) return;
     await fetch(`${API}/${w.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         Workouts: editExercise.value,
-        Sets: editSets.value,
         Reps: editReps.value,
       }),
     });
@@ -146,26 +167,26 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
   });
 
   // Cancel
-  row.querySelector("#btn-cancel")!.addEventListener("click", () => fetchWorkouts());
+  row
+    .querySelector("#btn-cancel")!
+    .addEventListener("click", () => fetchWorkouts());
 }
 
 // Log new workout
 btnLog.addEventListener("click", async () => {
   const exercise = inputExercise.value.trim();
-  const sets = inputSets.value.trim();
   const reps = inputReps.value.trim();
 
-  if (!exercise || !sets || !reps) return;
-  if (parseInt(sets) <= 0 || parseInt(reps) <= 0) return;
+  if (!exercise || !reps) return;
+  if (parseInt(reps) <= 0) return;
 
   await fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ Workouts: exercise, Sets: sets, Reps: reps }),
+    body: JSON.stringify({ Workouts: exercise, Reps: reps }),
   });
 
   inputExercise.value = "";
-  inputSets.value = "";
   inputReps.value = "";
   fetchWorkouts();
   showToast("Workout logged.");
