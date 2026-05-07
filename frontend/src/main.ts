@@ -1,4 +1,4 @@
-const API = "http://localhost:3000/workouts";
+const API = "http://localhost:3000/workouts"; //if using tailscale, change the the url to your tailscale ip
 
 // Types
 interface Workout {
