@@ -71,7 +71,13 @@ function renderWorkouts(workouts: Workout[]): void {
     // Create date container
     const dateContainer = document.createElement("div");
     dateContainer.className = "date-group";
-    dateContainer.innerHTML = `<div class="date-label">${new Date(date).toLocaleDateString()}</div>`;
+    const [year, month, day] = date.split("-");
+    const formatted = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day),
+    ).toLocaleDateString();
+    dateContainer.innerHTML = `<div class="date-label">${formatted}</div>`;
     list.appendChild(dateContainer);
 
     //Group by exercise within that date
