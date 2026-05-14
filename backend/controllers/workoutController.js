@@ -18,6 +18,7 @@ exports.createWorkout = function(req, res) {
     console.log(req.body);
     const newWorkout = {
         Workouts: req.body.Workouts,
+        Weight: req.body.Weight,
         Reps: req.body.Reps
     };
 
@@ -30,6 +31,7 @@ exports.createWorkout = function(req, res) {
 exports.updateWorkout = function(req, res) {
     const updatedWorkout = {
         Workouts: req.body.Workouts,
+        Weight: req.body.Weight,
         Reps: req.body.Reps
     };
 

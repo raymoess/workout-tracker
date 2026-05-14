@@ -5,6 +5,7 @@ interface Workout {
   id: number;
   Workouts: string;
   Reps: string;
+  Weight: String;
   Created_on: string;
 }
 
@@ -15,6 +16,7 @@ const inputExercise = document.getElementById(
   "input-exercise",
 ) as HTMLInputElement;
 const inputReps = document.getElementById("input-reps") as HTMLInputElement;
+const inputWeight = document.getElementById("input-weight") as HTMLInputElement;
 const btnLog = document.getElementById("btn-log") as HTMLButtonElement;
 
 // Validation
@@ -32,6 +34,12 @@ inputExercise.addEventListener("input", () => {
 inputReps.addEventListener("input", () => {
   if (!isValidNumber(inputReps.value)) {
     inputReps.value = inputReps.value.replace(/[^0-9]/g, "");
+  }
+});
+
+inputWeight.addEventListener("input", () => {
+  if (!isValidNumber(inputWeight.value)) {
+    inputWeight.value = inputWeight.value.replace(/[^0-9]/g, "");
   }
 });
 
@@ -102,6 +110,7 @@ function renderWorkouts(workouts: Workout[]): void {
         row.innerHTML = `
           <div class="workout-stat">Set <span>${setNumber}</span></div>
           <div class="workout-stat"><span>${w.Reps}</span> reps</div>
+          <div class="workout-stat"><span>${w.Weight}</span> weight (lB)</div>
           <div class="actions">
             <button class="btn btn-edit" data-id="${w.id}">Edit</button>
             <button class="btn btn-danger" data-id="${w.id}">Delete</button>
@@ -134,6 +143,7 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
     <div class="edit-row">
       <input id="edit-exercise" type="text" value="${w.Workouts}" />
       <input id="edit-reps" type="text" value="${w.Reps}" />
+      <input id="edit-weight" type="text" value="${w.Weight}" />
       <div class="actions">
         <button class="btn btn-save" id="btn-save">Save</button>
         <button class="btn btn-cancel" id="btn-cancel">Cancel</button>
@@ -143,6 +153,7 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
 
   const editExercise = row.querySelector("#edit-exercise") as HTMLInputElement;
   const editReps = row.querySelector("#edit-reps") as HTMLInputElement;
+  const editWeight = row.querySelector("#edit-weight") as HTMLInputElement;
 
   // Validation on edit inputs
   editExercise.addEventListener("input", () => {
@@ -157,14 +168,21 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
     }
   });
 
+  editWeight.addEventListener("input", () => {
+    if (!isValidNumber(editWeight.value)) {
+      editReps.value = editWeight.value.replace(/[^0-9]/g, "");
+    }
+  });
+
   // Save
   row.querySelector("#btn-save")!.addEventListener("click", async () => {
-    if (!editExercise.value || !editReps.value) return;
+    if (!editExercise.value || !editReps.value || !editWeight.value) return;
     await fetch(`${API}/${w.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         Workouts: editExercise.value,
+        Weight: editWeight.value,
         Reps: editReps.value,
       }),
     });
@@ -182,18 +200,21 @@ function showEditRow(row: HTMLDivElement, w: Workout): void {
 btnLog.addEventListener("click", async () => {
   const exercise = inputExercise.value.trim();
   const reps = inputReps.value.trim();
+  const weight = inputWeight.value.trim();
 
-  if (!exercise || !reps) return;
+  if (!exercise || !reps || !weight) return;
   if (parseInt(reps) <= 0) return;
+  if (parseInt(weight) <= 0) return;
 
   await fetch(API, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ Workouts: exercise, Reps: reps }),
+    body: JSON.stringify({ Workouts: exercise, Reps: reps, Weight: weight }),
   });
 
   inputExercise.value = "";
   inputReps.value = "";
+  inputWeight.value = "";
   fetchWorkouts();
   showToast("Workout logged.");
 });
